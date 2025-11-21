@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Runner Arena – Endless Runner Lofi Chill</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body, html { margin:0; padding:0; overflow:hidden; background:#111; color:#fff; font-family:sans-serif; }
+  #ui { position:absolute; top:10px; left:10px; z-index:10; }
+  button { margin:5px; padding:8px 12px; background:#222; border:none; color:#0f0; cursor:pointer; }
+  button:hover { background:#333; }
+  #mute { position:absolute; top:10px; right:10px; }
+  #canvas { display:block; }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="ui">
+  <button id="play">Play</button>
+  <button id="leaderboard">Leaderboard</button>
+  <button id="shop">Shop</button>
+  <button id="achievements">Achievements</button>
+  <div id="daily"></div>
+</div>
+<button id="mute">🔇</button>
+<script>
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+window.addEventListener('resize',resize);resize();
+
+const lanes=[canvas.width/4,canvas.width/2,3*canvas.width/4];
+let lane=1;
+let speed=200; // pixels per second
+let score=0;
+let distance=0;
+let obstacles=[];
+let coins=[];
+let lastTime=0;
+let gameOver=false;
+let mute=false;
+let boost=null;
+let boostTimer=0;
+let boostCooldown=0;
+let boostActive=false;
+let boostType=null;
+let boostDuration=0;
+let boostCooldownTimer=0;
+let dailyChallenge=null;
+let dailyChallengeDone=false;
+let achievements=JSON.parse(localStorage.getItem('achievements')||'{}');
+let shop=JSON.parse(localStorage.getItem('shop')||'{}');
+let leaderboard=JSON.parse(localStorage.getItem('leaderboard')||'[]');
+let points=JSON.parse(localStorage.getItem('points')||'0');
+let skins=['robot','ninja','alien'];
+let currentSkin=0;
+let activeBoost=0;
+let boostUses=0;
+let coinsCollected=0;
+let lastBoostUse=0;
+
+// Audio
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+let masterGain=audioCtx.createGain();masterGain.connect(audioCtx.destination);
+function setMute(m){mute=m;masterGain.gain.value=m?0:1;}
+setMute(false);
+function playSound(frequency,detune=0,duration=0.2){if(mute)return;const osc=audioCtx.createOscillator();osc.frequency.value=frequency;osc.detune.value=detune;osc.type='sine';osc.connect(masterGain);osc.start();osc.stop(audioCtx.currentTime+duration);}
+function playLofi(){// simple continuous pad
+  const osc=audioCtx.createOscillator();osc.frequency.value=220;osc.type='sine';osc.connect(masterGain);osc.start();
+  const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=200;osc.connect(filter);filter.connect(masterGain);
+  setInterval(()=>{osc.frequency.setValueAtTime(220+Math.random()*20, audioCtx.currentTime);},2000);
+}
+playLofi();
+
+// Game logic
+function spawnObstacle(){obstacles.push({x:lanes[lane],y:-50,width:40,height:40, type:'wall'});}
+function spawnCoin(){coins.push({x:lanes[lane],y:-50,width:20,height:20});}
+function update(dt){
+  if(gameOver)return;
+  distance+=speed*dt;
+  score=Math.floor(distance/10);
+  if(Math.random()<0.01)spawnObstacle();
+  if(Math.random()<0.005)spawnCoin();
+  obstacles.forEach(o=>{o.y+=speed*dt;});
+  coins.forEach(c=>{c.y+=speed*dt;});
+  obstacles=obstacles.filter(o=>o.y<canvas.height+50);
+  coins=coins.filter(c=>c.y<canvas.height+50);
+  // collision
+  obstacles.forEach(o=>{
+    if(Math.abs(o.x-lanes[lane])<20 && Math.abs(o.y-canvas.height-50)<20){
+      if(boostActive && boostType==='shield'){boostActive=false;boostType=null;boostDuration=0;boostCooldown=15;boostCooldownTimer=0;}
+      else{gameOver=true;saveGame();}
+    }
+  });
+  // coin collection
+  coins.forEach(c=>{
+    if(Math.abs(c.x-lanes[lane])<20 && Math.abs(c.y-canvas.height-50)<20){
+      coinsCollected++;score+=2;playSound(600,0,0.1);
+    }
+  });
+  // boost logic
+  if(boostActive){boostDuration-=dt; if(boostDuration<=0){boostActive=false;boostType=null;boostCooldown=15;boostCooldownTimer=0;}}
+  if(boostCooldownTimer>0){boostCooldownTimer-=dt; if(boostCooldownTimer<=0){boostCooldown=0;}}
+  // daily challenge
+  if(dailyChallenge && !dailyChallengeDone){
+    if(dailyChallenge.type==='jump' && boostActive && boostType==='jump'){dailyChallengeDone=true;points+=50;savePoints();}
+  }
+}
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // draw lanes
+  ctx.strokeStyle='#444';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(lanes[0],0);ctx.lineTo(lanes[0],canvas.height);ctx.moveTo(lanes[2],0);ctx.lineTo(lanes[2],canvas.height);ctx.stroke();
+  // draw player
+  ctx.fillStyle='#0f0';
+  ctx.fillRect(lanes[lane]-15,canvas.height-60,30,60);
+  // draw obstacles
+  ctx.fillStyle='#f00';
+  obstacles.forEach(o=>ctx.fillRect(o.x-20,o.y-20,40,40));
+  // draw coins
+  ctx.fillStyle='#ff0';
+  coins.forEach(c=>ctx.fillRect(c.x-10,c.y-10,20,20));
+  // UI
+  ctx.fillStyle='#fff';
+  ctx.font='20px sans-serif';
+  ctx.fillText('Score: '+score,10,30);
+  ctx.fillText('Points: '+points,10,60);
+}
+function loop(timestamp){
+  if(!lastTime)lastTime=timestamp;
+  const dt=(timestamp-lastTime)/1000;
+  lastTime=timestamp;
+  update(dt);
+  draw();
+  if(!gameOver)requestAnimationFrame(loop);
+}
+function startGame(){
+  lane=1;speed=200;score=0;distance=0;obstacles=[];coins=[];gameOver=false;boost=null;boostTimer=0;boostActive=false;boostType=null;boostDuration=0;boostCooldownTimer=0;dailyChallengeDone=false;
+  dailyChallenge=getDailyChallenge();
+  document.getElementById('daily').innerText='Daily: '+dailyChallenge.desc;
+  lastTime=0;
+  requestAnimationFrame(loop);
+}
+function getDailyChallenge(){
+  const challenges=[{type:'jump',desc:'1000m with Jump only',points:50}];
+  return challenges[Math.floor(Math.random()*challenges.length)];
+}
+function saveGame(){localStorage.setItem('points',points.toString());}
+function savePoints(){localStorage.setItem('points',points.toString());}
+function toggleMute(){mute=!mute;setMute(mute);document.getElementById('mute').innerText=mute?'🔊':'🔇';}
+document.getElementById('play').onclick=startGame;
+document.getElementById('mute').onclick=toggleMute;
+
+// Simple shop and achievements UI placeholders
+document.getElementById('shop').onclick=()=>alert('Shop not implemented');
+document.getElementById('achievements').onclick=()=>alert('Achievements not implemented');
+document.getElementById('leaderboard').onclick=()=>alert('Leaderboard not implemented');
+</script>
+</body>
+</html>
