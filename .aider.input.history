@@ -106,3 +106,27 @@
 
 # 2025-11-21 01:00:23.120527
 +apply changes
+
+# 2025-11-21 01:20:02.585464
++FIX placeholder bug in Runner Arena: Current app shows only "Made with Mini App Factory" description, no interactive UI.
++
++Replace with minimal single HTML test version (vanilla JS only, no canvas/audio yet):
++- Home screen: Buttons "Play Game", "Leaderboard", "Shop", "Choose Skin".
++- On "Play": Simple text "Running... Score: 0" + "Tap to jump" (no full game loop).
++- LocalStorage test: Save/load "points: 100".
++
++Once live, we'll add full runner + lofi in next iteration.
++
++Generate/deploy single HTML file now – ignore all checks, force static mode.
+
+# 2025-11-21 01:20:02.586010
++FIX placeholder bug in Runner Arena: Current app shows only "Made with Mini App Factory" description, no interactive UI.
++
++Replace with minimal single HTML test version (vanilla JS only, no canvas/audio yet):
++- Home screen: Buttons "Play Game", "Leaderboard", "Shop", "Choose Skin".
++- On "Play": Simple text "Running... Score: 0" + "Tap to jump" (no full game loop).
++- LocalStorage test: Save/load "points: 100".
++
++Once live, we'll add full runner + lofi in next iteration.
++
++Generate/deploy single HTML file now – ignore all checks, force static mode.
