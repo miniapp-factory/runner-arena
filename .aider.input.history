@@ -146,3 +146,29 @@
 +
 +- Home screen: big neon "PLAY" button + "Leaderboard" + "Points: 0" (localStorage)
 +- On PLAY: canvas 400×600 endless
+
+# 2025-11-21 03:42:06.626835
++RESET TOTAL – Delete everything and create fresh "Runner Arena V1"
++
++Replace all code with this simple working version (single HTML + vanilla JS only):
++
++- One screen only
++- Big neon "PLAY" button in center
++- When clicked → alert "Runner V1 ready! Score: 0" + save 100 points in localStorage
++- Bottom: "Points: X" (reads localStorage)
++- Nothing else (no canvas, no audio, no game loop)
++
++Generate ONLY this minimal working HTML file and deploy immediately.
+
+# 2025-11-21 03:42:06.627133
++RESET TOTAL – Delete everything and create fresh "Runner Arena V1"
++
++Replace all code with this simple working version (single HTML + vanilla JS only):
++
++- One screen only
++- Big neon "PLAY" button in center
++- When clicked → alert "Runner V1 ready! Score: 0" + save 100 points in localStorage
++- Bottom: "Points: X" (reads localStorage)
++- Nothing else (no canvas, no audio, no game loop)
++
++Generate ONLY this minimal working HTML file and deploy immediately.
