@@ -130,3 +130,19 @@
 +Once live, we'll add full runner + lofi in next iteration.
 +
 +Generate/deploy single HTML file now – ignore all checks, force static mode.
+
+# 2025-11-21 01:51:33.501538
++RESET & REPLACE EVERYTHING – Delete all previous code and create fresh "Runner Arena V2"
++
++IGNORE ALL PREVIOUS CONTENT. Delete everything and generate ONLY this new single HTML file:
++
++- Home screen: big neon "PLAY" button + "Leaderboard" + "Points: 0" (localStorage)
++- On PLAY: canvas 400×600 endless
+
+# 2025-11-21 01:51:33.502520
++RESET & REPLACE EVERYTHING – Delete all previous code and create fresh "Runner Arena V2"
++
++IGNORE ALL PREVIOUS CONTENT. Delete everything and generate ONLY this new single HTML file:
++
++- Home screen: big neon "PLAY" button + "Leaderboard" + "Points: 0" (localStorage)
++- On PLAY: canvas 400×600 endless
