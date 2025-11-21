@@ -2,17 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Runner Arena V2</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runner Arena V1</title>
 <style>
-body{margin:0;padding:0;background:#111;color:#fff;font-family:sans-serif;}
-#ui{position:absolute;top:10px;left:10px;}
-button{margin:5px;padding:10px 20px;background:#222;border:none;color:#0f0;cursor:pointer;font-size:18px;}
-button:hover{background:#333;}
-#canvas{display:block;margin:0 auto;background:#000;}
-#points{position:absolute;top:10px;right:10px;font-size:18px;}
+body{margin:0;padding:0;background:#111;color:#fff;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
+button{padding:20px 40px;background:#0f0;border:none;color:#111;font-size:32px;cursor:pointer;}
+button:hover{background:#0c0;}
+#points{position:absolute;bottom:10px;right:10px;font-size:18px;}
 </style>
 </head>
+<body>
+<button id="play">PLAY</button>
+<div id="points">Points: 0</div>
+<script>
+let points=0;
+if(localStorage.getItem('points')){points=parseInt(localStorage.getItem('points'));}else{points=100;localStorage.setItem('points',points);}
+document.getElementById('points').innerText='Points: '+points;
+document.getElementById('play').onclick=function(){
+  alert('Runner V1 ready! Score: 0');
+  localStorage.setItem('points',100);
+  points=100;
+  document.getElementById('points').innerText='Points: '+points;
+};
+</script>
+</body>
+</html>
 <body>
 <div id="ui">
 <button id="play">PLAY</button>
