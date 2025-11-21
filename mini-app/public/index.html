@@ -2,6 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Runner Arena V2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;padding:0;background:#111;color:#fff;font-family:sans-serif;}
+#ui{position:absolute;top:10px;left:10px;}
+button{margin:5px;padding:10px 20px;background:#222;border:none;color:#0f0;cursor:pointer;font-size:18px;}
+button:hover{background:#333;}
+#canvas{display:block;margin:0 auto;background:#000;}
+#points{position:absolute;top:10px;right:10px;font-size:18px;}
+</style>
+</head>
+<body>
+<div id="ui">
+<button id="play">PLAY</button>
+<button id="leaderboard">Leaderboard</button>
+</div>
+<div id="points">Points: 0</div>
+<canvas id="canvas" width="400" height="600"></canvas>
+<script>
+let points=0;
+if(localStorage.getItem('points')){points=parseInt(localStorage.getItem('points'));}else{points=100;localStorage.setItem('points',points);}
+document.getElementById('points').innerText='Points: '+points;
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+let y=0;
+function loop(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#0f0';
+  ctx.fillRect(50,y,300,20);
+  y+=2;
+  if(y>canvas.height){y=0;}
+  requestAnimationFrame(loop);
+}
+document.getElementById('play').onclick=function(){
+  loop();
+};
+</script>
+</body>
+</html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <title>Runner Arena – Minimal Test</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
