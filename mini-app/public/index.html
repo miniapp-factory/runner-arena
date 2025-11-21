@@ -2,6 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Runner Arena – Minimal Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:sans-serif;margin:0;padding:0;background:#111;color:#fff;}
+#ui{position:absolute;top:10px;left:10px;}
+button{margin:5px;padding:8px 12px;background:#222;border:none;color:#0f0;cursor:pointer;}
+button:hover{background:#333;}
+#game{margin-top:50px;}
+</style>
+</head>
+<body>
+<div id="ui">
+<button id="play">Play Game</button>
+<button id="leaderboard">Leaderboard</button>
+<button id="shop">Shop</button>
+<button id="choose-skin">Choose Skin</button>
+</div>
+<div id="game"></div>
+<script>
+let points=0;
+if(localStorage.getItem('points')){points=parseInt(localStorage.getItem('points'));}else{points=100;localStorage.setItem('points',points);}
+document.getElementById('game').innerText='Points: '+points;
+document.getElementById('play').onclick=function(){
+  document.getElementById('game').innerText='Running... Score: 0\\nTap to jump';
+};
+</script>
+</body>
+</html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <title>Runner Arena – Endless Runner Lofi Chill</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
